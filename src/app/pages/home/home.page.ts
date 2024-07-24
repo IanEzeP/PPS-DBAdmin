@@ -1,15 +1,27 @@
-import { Component } from '@angular/core';
+import { Component, OnDestroy, OnInit } from '@angular/core';
 import { AuthService } from 'src/app/services/auth.service';
 import { Router } from '@angular/router';
+import { ActionSheetController } from '@ionic/angular';
 import Swal from 'sweetalert2';
+
 @Component({
   selector: 'app-home',
   templateUrl: 'home.page.html',
   styleUrls: ['home.page.scss'],
 })
-export class HomePage {
+export class HomePage implements OnInit, OnDestroy {
 
-  constructor(private auth: AuthService, private router: Router) {}
+  public listUsers: Array<any> = [];
+
+  constructor(private auth: AuthService, private router: Router, private actionSheetCtrl: ActionSheetController) {}
+
+  ngOnInit(): void {
+    
+  }
+
+  ngOnDestroy(): void {
+    
+  }
 
   cerraSesion() {
     Swal.fire({
