@@ -23,7 +23,60 @@ export class HomePage implements OnInit, OnDestroy {
     
   }
 
-  cerraSesion() {
+  async displayOptions() {
+    let optionsArray: Array<any> = [
+      {
+        text: 'Cerrar Sesión',
+        role: 'destructive',
+        data: {
+          action: 'logout'
+        }
+      },
+      {
+        text: 'Cancelar',
+        role: 'cancel',
+        data: {
+          action: 'cancel'
+        }
+      }
+    ];
+
+    if (this.auth.perfil == 'admin') {
+      optionsArray.push(
+        {
+          text: 'Alta de usuario',
+          data: {
+            action: 'alta'
+          }
+        }
+      );
+      optionsArray.reverse();
+    }
+
+    const actionSheet = await this.actionSheetCtrl.create({
+      header: 'Opciones',
+      buttons: optionsArray
+    });
+
+    await actionSheet.present();
+
+    const { data, role } = await actionSheet.onWillDismiss();
+    if (role != 'backdrop') {
+      switch (data.action) {
+        case 'logout':
+          this.cerrarSesion();
+          break;
+        case 'alta':
+          this.router.navigateByUrl('/alta-usuario');
+          break;
+        default:
+          console.log('Canceled');
+          break;
+      }
+    }
+  }
+
+  cerrarSesion() {
     Swal.fire({
       heightAuto: false,
       title: '¿Cerrar Sesión?',

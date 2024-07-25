@@ -84,7 +84,7 @@ export class AlertService {
         icon: 'success',
         title: mensaje,
         toast: true,
-        position: 'bottom',
+        position: 'top',
         timer: 2400,
         timerProgressBar: false,
         showCloseButton: true,

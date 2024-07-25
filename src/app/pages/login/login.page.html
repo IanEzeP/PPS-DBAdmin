@@ -12,8 +12,16 @@
 
     <form class="needs-validation" [formGroup]="formLog">
       <ion-input label="Correo:" type="email" fill="solid" formControlName="email"></ion-input>
+      <ion-text class="error" color="danger" *ngIf="isValidField('email')">
+        {{ getErrorByField("email") }}
+      </ion-text>
+
       <ion-input label="Clave:" type="password" fill="solid" formControlName="password"></ion-input>
-      <ion-button color="tertiary" expand="block" (click)="this.iniciarSesion()">Jugar</ion-button>
+      <ion-text class="error" color="danger" *ngIf="isValidField('password')">
+        {{ getErrorByField("password") }}
+      </ion-text>
+      
+      <ion-button color="tertiary" expand="block" (click)="this.iniciarSesion()">Ingresar</ion-button>
     </form>
     
     <div *ngIf="this.cargaFin == true; then mostrar else esperar"></div>

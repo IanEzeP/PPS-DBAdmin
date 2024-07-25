@@ -1,0 +1,32 @@
+<ion-header [translucent]="true">
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-button (click)="goBack()"><ion-icon name="arrow-undo-outline" size="large"></ion-icon></ion-button>
+    </ion-buttons>
+    <ion-title>Alta de Usuario</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content [fullscreen]="true">
+  <div id="container">
+  
+    <ion-fab *ngIf="this.scanAvailable && this.scanSupported" size="small" slot="fixed" vertical="top" horizontal="end" edge="true">
+      <ion-fab-button (click)="scan()" color="primary">
+        <img src=""  style="padding: 10px;" alt="SCAN QR">
+      </ion-fab-button>
+    </ion-fab>
+    <!--
+    <ion-card>
+      <ion-item>
+        <ion-label>{{ this.apellido }}</ion-label>
+      </ion-item>
+      <ion-item>
+        <ion-label>{{ this.nombre }}</ion-label>
+      </ion-item>
+      <ion-item>
+        <ion-label>{{ this.dni }}</ion-label>
+      </ion-item>
+    </ion-card>
+-->
+  </div>
+</ion-content>
