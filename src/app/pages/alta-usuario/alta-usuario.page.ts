@@ -5,16 +5,11 @@ import { AuthService } from 'src/app/services/auth.service';
 import { AlertService } from 'src/app/services/alert.service';
 import { ValidatorService } from 'src/app/services/validator.service';
 import { Subscription } from 'rxjs';
-import { FormBuilder, FormGroup, Validators, AbstractControl } from '@angular/forms';
-import { Camera, CameraResultType, CameraSource } from '@capacitor/camera';
+import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { Camera, CameraResultType } from '@capacitor/camera';
 import { AngularFirestore } from '@angular/fire/compat/firestore';
 import { AngularFireStorage } from '@angular/fire/compat/storage';
-import {
-  BarcodeScanner,
-  Barcode,
-  BarcodeFormat,
-  LensFacing,
-} from '@capacitor-mlkit/barcode-scanning';
+import { BarcodeScanner, Barcode } from '@capacitor-mlkit/barcode-scanning';
 import Swal from 'sweetalert2';
 
 @Component({
@@ -27,7 +22,7 @@ export class AltaUsuarioPage implements OnInit, OnDestroy {
   public alertController: any;
   public form: FormGroup;
   public imgPerfil: string = '';
-  public imgFile: any;
+  public imgFileBlob: any;
 
   public barcodes: Barcode[] = [];
   public infoQR: string | null = null;
@@ -59,13 +54,12 @@ export class AltaUsuarioPage implements OnInit, OnDestroy {
       ],
       apellido: [
         '',
-        [Validators.required, Validators.minLength(2), Validators.maxLength(50), Validators.pattern(/^[a-zA-Z\s]*$/)]
+        [Validators.required, Validators.minLength(2), Validators.maxLength(50), Validators.pattern(/^[a-zA-Z\s]*$/)]// (/^[a-zA-ZÀ-ÿ\u00f1\u00d1]+(\s*[a-zA-ZÀ-ÿ\u00f1\u00d1]*)*$/) Expresión regular para evitar números, puntos y comas, aceptar espacios, letras con tíldes y la ñ.
       ],
       dni: [
         0, 
         [Validators.required, Validators.pattern(/^\d{1,10}$/)]
       ]
-      //foto: []
     });
   }
 
@@ -133,25 +127,19 @@ export class AltaUsuarioPage implements OnInit, OnDestroy {
       alert('Error parsing QR data');
     }
   }
-/*
+
   registrar()
   {
-    if(this.formRegistro.valid && this.imgFile)
-    {
-      let formValues = this.formRegistro.value;
-
-      this.administrador = new Usuario('', formValues.nombre, formValues.apellido, formValues.edad,
-        formValues.dni, formValues.email, formValues.password, 'empty');
+    if(this.form.valid && this.imgFileBlob) {
+      let formValues = this.form.value;
 
       this.guardarUsuario();
-    }
-    else
-    {
-      this.alertas.failureAlert("ERROR - Hay campos vacíos o incorrectos");
+    } else {
+      this.alert.sweetAlert("ERROR", "Hay campos vacíos o incorrectos", 'error');
     }
   }
 
-  async tomarFoto(tipo: string)
+  async tomarFoto()
   {
     const image = await Camera.getPhoto({
       quality: 100,
@@ -161,111 +149,35 @@ export class AltaUsuarioPage implements OnInit, OnDestroy {
       resultType: CameraResultType.Uri
     });
 
-    this.subirFotoPerfil(tipo, image);
+    this.subirFotoPerfil(image);
   }
 
-  async guardarImagen() {
-    try {
-      const nombreArchivo =  this.form.value.dni + this.form.value.nombre + this.form.value.apellido;
-      const fotoBase64 = this.fotoUrl;
-      const dataURL = `data:image/jpeg;base64,${fotoBase64}`;
+  async subirFotoPerfil(file : any) {
+    if(file) {
+      if(file.format == 'jpg' || file.format == 'jpeg' || file.format == 'png' || file.format == 'jfif') {
+        //this.alert.waitAlert('Publicando...', 'Esto puede demorar unos segundos');
 
-      const urlDescarga = await this.storage.subirImagen('fotosPerfil',nombreArchivo,dataURL);
-
-      if (!urlDescarga) {
-        Swal.fire({
-          html: '<br><label style="font-size:80%">Error: No se pudo obtener la URL de descarga de la imagen</label>',
-          confirmButtonText: 'Ok',
-          confirmButtonColor: 'var(--ion-color-primary)',
-          heightAuto: false,
-        });
-        return false;
-      }
-
-      return urlDescarga;
-    } catch (error) {
-      console.error('Error al guardar la imagen:', error);
-      return false;
-    }
-  }
-
-  async subirFotoPerfil(tipo : string, file : any)
-  {
-    if(file)
-    {
-      if(file.format == 'jpg' || file.format == 'jpeg' || file.format == 'png' || file.format == 'jfif')
-      {
-        this.alert.waitAlert('Publicando...', 'Esto puede demorar unos segundos');
-
-        let id_imagen = this.firestore.createId();
-        let fecha = new Date();
+        //let id_imagen = this.firestore.createId();
+        //let fecha = new Date();
 
         const response = await fetch(file.webPath!);
-        const blob = await response.blob();
+        this.imgFileBlob = await response.blob();
 
-        const path = 'Relevamiento/' + this.auth.nombre + '_' + this.auth.id + '/' + fecha.getTime() + '.' + file.format;
-        const uploadTask = await this.firestorage.upload(path, blob); 
-        const url = await uploadTask.ref.getDownloadURL(); 
-        
-        const documento = this.firestore.doc("fotos-edificio/" + id_imagen);
-        documento.set(
-        {
-          imagen : url,
-          tipo: tipo,
-          usuario: this.auth.nombre,
-          id_usuario: this.auth.id,
-          id_foto: id_imagen,
-          votantes: new Array(0),
-          fecha: new Date(fecha.getFullYear(), fecha.getMonth(), fecha.getDate(), fecha.getHours(), fecha.getMinutes()),
-          votos: 0
-        });
-
-        this.validarGuardado(documento.ref.id);
+        //const path = 'Relevamiento/' + this.auth.nombre + '_' + this.auth.id + '/' + fecha.getTime() + '.' + file.format;
+        //const uploadTask = await this.firestorage.upload(path, blob); 
+        //const url = await uploadTask.ref.getDownloadURL(); 
+      } else {
+        this.alert.sweetAlert("ERROR", "Formato de archivo incompatible", 'error');
       }
-      else
-      {
-        this.alert.failureAlert("ERROR", "Formato de archivo incompatible");
-      }
-    }
-    else
-    {
-      this.alert.failureAlert("ERROR", "Ningún archivo fue seleccionado");
+    } else {
+      this.alert.sweetAlert("ERROR", "Ningún archivo fue seleccionado", 'error');
     }
   }
-
-  async subirFotoPerfil(id : string, directorio : string, file : any)
-  {
-    if(file)
-    {
-      let extension : string = file.name.slice(file.name.indexOf('.'));
-
-      if(extension == '.jpg' || extension == '.jpeg' || extension == '.png' || extension == '.jfif')
-      {
-        const path = directorio + '/' + id + '/' + this.formRegistro.controls['nombre'].value + extension;
-        const uploadTask = await this.firestorage.upload(path, file);
-        const url = await uploadTask.ref.getDownloadURL(); 
-
-        const documento = this.firestore.doc(directorio + '/' + id);
-        documento.update({ ImagenPerfil : url });
-      }
-      else
-      {
-        this.alertas.infoToast("El formato del archivo seleccionado no es compatible.");
-      }
-    }
-  }
-
-  onFileChange($event : any)
-  {
-    this.imgFile = $event.target.files[0];
-  }*/
-
-  
 
   reestablecerDatos()
   {
     this.imgPerfil = '';
-    this.imgFile = null;
+    this.imgFileBlob = null;
     this.form.reset({ nombre: '', apellido: '', correo: '', dni: 0, clave: '', confirmarClave: ''});
   }
 
