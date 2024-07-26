@@ -50,14 +50,11 @@ export class AuthService {
     try {
       const userCredential = await createUserWithEmailAndPassword(this.auth, email, password);
       await this.logIn(email, password);
-      const user = userCredential.user;
-
-      if (user != null) {
-        //await sendEmailVerification(user);
-        this.logueado = false;
-      }
+  
+      return userCredential;
     } catch (error) {
       console.error(error);
+      throw error;
     }
   }
   

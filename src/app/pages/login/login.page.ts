@@ -87,7 +87,6 @@ export class LoginPage implements OnInit, OnDestroy {
         if (res != null && res.user.email != null) {
           this.auth.email = res.user.email;
           this.data.obtenerUsuarioPorEmail(res.user.email).then(async (cliente) => {
-            console.log(cliente);
             if(cliente) {
               this.auth.perfil = cliente.perfil;
             }

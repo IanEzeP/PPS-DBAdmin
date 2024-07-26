@@ -1,0 +1,46 @@
+* {
+    margin: 0;
+    padding: 0;
+}
+
+ion-title {
+  padding: 20px;
+}
+
+ion-content{
+    --background: #e78c14;
+    --overflow: hidden;
+}
+
+
+form {
+    padding: 20px;
+}
+
+.photo-container {
+    display: flex;
+    margin-bottom: 30px; 
+}
+
+div.container {
+    height: 100%;
+    width: 100%;
+}
+
+ion-card {
+    margin-top: 20%;
+}
+
+ion-button.photo-button {
+    margin: 30px 0 0;
+    width: 100%;
+}
+
+ion-button.scan-button {
+    margin: 10px 25% 0;
+    width: 50%;
+}
+
+ion-input.error {
+    font-size: 18px;
+}

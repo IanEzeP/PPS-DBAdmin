@@ -17,8 +17,6 @@ export class ValidatorService {
     if (!form.controls[field]) return null;
 
     const errors = form.controls[field].errors || {};
-
-    console.log(errors);
     let error = null
 
     for (const key of Object.keys(errors)) {
@@ -35,9 +33,15 @@ export class ValidatorService {
         case 'min':
           error = `Valor no puede ser menor a ${errors['min'].min}`;
           break;
-        case 'pattern':
-          error = `Ingrese un correo válido`;
+        case 'max':
+          error = `No puede tener más de ${errors['max'].max.toString().length} caracteres`;
           break;
+        case 'pattern':
+          error = `No se permiten carácteres especiales`;
+          break;
+        case 'decimal':
+          error = `Sin puntos ni comas`;
+          break; 
         case 'passwordMismatch':
           error = `Las claves no coinciden`;
           break;
@@ -76,21 +80,20 @@ export class ValidatorService {
   }
 
   passwordMatchValidator(control: AbstractControl) : null | ValidationErrors  {
-    const clave = control.get('clave');
-    const confirmarClave = control.get('confirmarClave');
+    const clave = control.parent?.value.clave;
+    const confirmarClave = <string>control.value.toString();
+
     if (!clave || !confirmarClave) return null;
-    return clave.value === confirmarClave.value ? null : { passwordMismatch: true };
+    return clave === confirmarClave ? null : { passwordMismatch: true };
   }
 
-  getFirebaseAuthErrorByCode(code: string) : string {
-    switch (code) {
-      case 'auth/invalid-credential':
-        return 'Las credenciales son incorrectas.';
+  noDecimalValidator(control: AbstractControl) : null | ValidationErrors {
+    const valor: string = control.value != null? control.value.toString() : '';
 
-        case 'auth/email-already-in-use':
-          return 'El correo electrónico ya está siendo utilizado por otro usuario.'
+    if (valor.includes(',') || valor.includes('.')) {
+      return { decimal: true };
+    } else {
+      return null;
     }
-
-    return '';
   }
 }

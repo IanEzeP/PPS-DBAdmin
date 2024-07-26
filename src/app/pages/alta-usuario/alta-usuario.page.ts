@@ -1,10 +1,8 @@
-import { Component, OnInit, OnDestroy } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
-import { DatabaseService } from 'src/app/services/database.service';
 import { AuthService } from 'src/app/services/auth.service';
 import { AlertService } from 'src/app/services/alert.service';
 import { ValidatorService } from 'src/app/services/validator.service';
-import { Subscription } from 'rxjs';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Camera, CameraResultType } from '@capacitor/camera';
 import { AngularFirestore } from '@angular/fire/compat/firestore';
@@ -17,22 +15,18 @@ import Swal from 'sweetalert2';
   templateUrl: './alta-usuario.page.html',
   styleUrls: ['./alta-usuario.page.scss'],
 })
-export class AltaUsuarioPage implements OnInit, OnDestroy {
+export class AltaUsuarioPage implements OnInit {
 
-  public alertController: any;
   public form: FormGroup;
-  public imgPerfil: string = '';
-  public imgFileBlob: any;
+  public imgFile: any;
 
   public barcodes: Barcode[] = [];
   public infoQR: string | null = null;
   public scanSupported: boolean = false;
   public scanAvailable: boolean = false;
 
-  private subsDatabase: Subscription = Subscription.EMPTY;
-
   constructor(private firestore: AngularFirestore, private firestorage: AngularFireStorage, private alert: AlertService, private router: Router, 
-    private data: DatabaseService, private auth: AuthService, public formBuilder: FormBuilder, private validator: ValidatorService) 
+    private auth: AuthService, public formBuilder: FormBuilder, private validator: ValidatorService) 
   { 
     console.log("Entro en Alta de usuario");
     this.form = this.formBuilder.group({
@@ -44,21 +38,21 @@ export class AltaUsuarioPage implements OnInit, OnDestroy {
         '', 
         [Validators.required, Validators.minLength(6), Validators.maxLength(30), this.validator.spaceValidator]
       ],
-      confirmarclave: [
+      confirmarClave: [
         '', 
         [Validators.required, this.validator.passwordMatchValidator, this.validator.spaceValidator]
       ],
       nombre: [
         '',
-        [Validators.required, Validators.minLength(2), Validators.maxLength(50), Validators.pattern(/^[a-zA-Z\s]*$/)]//a-zA-Zá-úÁ-Ú 
+        [Validators.required, Validators.minLength(2), Validators.maxLength(50), Validators.pattern(/^[a-zA-ZÀ-ÿ\u00f1\u00d1]+(\s*[a-zA-ZÀ-ÿ\u00f1\u00d1]*)*$/)]//anterior -> "[a-zA-Zá-úÁ-Ú ]*" Cuti -> /^[a-zA-Z\s]*$/
       ],
       apellido: [
         '',
-        [Validators.required, Validators.minLength(2), Validators.maxLength(50), Validators.pattern(/^[a-zA-Z\s]*$/)]// (/^[a-zA-ZÀ-ÿ\u00f1\u00d1]+(\s*[a-zA-ZÀ-ÿ\u00f1\u00d1]*)*$/) Expresión regular para evitar números, puntos y comas, aceptar espacios, letras con tíldes y la ñ.
+        [Validators.required, Validators.minLength(2), Validators.maxLength(50), Validators.pattern(/^[a-zA-ZÀ-ÿ\u00f1\u00d1]+(\s*[a-zA-ZÀ-ÿ\u00f1\u00d1]*)*$/)]
       ],
       dni: [
-        0, 
-        [Validators.required, Validators.pattern(/^\d{1,10}$/)]
+        '', 
+        [Validators.required, Validators.min(10000000), Validators.max(99999999), this.validator.noDecimalValidator]//yo -> Validators.min(10000000), Validators.max(99999999) + this.noDecimalValidator Cuti -> Validators.pattern(/^\d{1,10}$/)
       ]
     });
   }
@@ -78,20 +72,21 @@ export class AltaUsuarioPage implements OnInit, OnDestroy {
         }
       }).catch((err) => console.log("Error: " + err));
     });
-
   }
 
-  ngOnDestroy(): void {
-    
+  isValidField(field: string): boolean | null {
+    return this.validator.isValidField(this.form, field);
+  }
+
+  getErrorByField(field: string): string | null {
+    return this.validator.getErrorByField(this.form, field);
   }
 
   async scan(): Promise<void> {
     const permission = await this.requestCameraPermission();
 
     if (!permission) {
-      this.alert.sweetAlert('Escáner rechazado',
-      'Debe habilitar los permisos para poder escanear el QR',
-      'error');
+      this.alert.sweetAlert('Escáner rechazado', 'Debe habilitar los permisos para poder escanear el QR', 'error');
     }
 
     const { barcodes } = await BarcodeScanner.scan();
@@ -128,19 +123,72 @@ export class AltaUsuarioPage implements OnInit, OnDestroy {
     }
   }
 
-  registrar()
-  {
-    if(this.form.valid && this.imgFileBlob) {
-      let formValues = this.form.value;
+  async register() {
+    const { nombre, apellido, dni, correo, clave } = this.form.value;
+    this.auth.register(correo, clave).then(async () => {
+      
+      this.alert.waitAlert('Comprobando datos', 'Este proceso puede demorar unos segundos');
 
-      this.guardarUsuario();
+      const path = `Administración/${nombre}_${apellido}_${dni}.${this.imgFile.format}`;
+
+      const response = await fetch(this.imgFile.webPath!);
+      const blob = await response.blob();
+      const uploadTask = await this.firestorage.upload(path, blob);
+      const url = await uploadTask.ref.getDownloadURL(); 
+
+      const id = this.firestore.createId();
+      const doc = this.firestore.doc("common-users/" + id);
+
+      doc.set({
+        nombre: nombre,
+        apellido: apellido,
+        correo: correo,
+        dni: dni,
+        clave: clave,
+        foto: url,
+      }).then(() => {
+        Swal.fire({
+          title: "Éxito",
+          text: "El usuario ha sido guardado exitosamente.",
+          icon: "success",
+          confirmButtonText: "Aceptar",
+          confirmButtonColor: 'var(--ion-color-primary)',
+          heightAuto: false
+        });
+  
+        this.clearData();
+      })
+      .catch((error) => {
+        console.error("Error al dar de alta el producto:", error);
+        Swal.fire({
+          title: "Error",
+          text: "Hubo un problema al dar de alta al usuario. Por favor, inténtelo de nuevo.",
+          icon: "error",
+          confirmButtonText: "Aceptar",
+          confirmButtonColor: 'var(--ion-color-medium)',
+          heightAuto: false
+        });
+      });
+    })
+    .catch(error => {
+      let excepcion : string = error.toString();
+      if (excepcion.includes("(auth/email-already-in-use)")) {
+        this.alert.sweetAlert("ERROR", "El correo electónico ya se encuentra en uso", 'error');
+      } else {
+        this.alert.sweetAlert("ERROR", excepcion, 'error');
+      }
+    });
+  }
+
+  async onSubmit() {
+    if (this.form.valid) {
+      this.register();
     } else {
       this.alert.sweetAlert("ERROR", "Hay campos vacíos o incorrectos", 'error');
     }
   }
 
-  async tomarFoto()
-  {
+  async takePhoto() {
     const image = await Camera.getPhoto({
       quality: 100,
       promptLabelHeader: 'Seleccione una opción',
@@ -149,23 +197,13 @@ export class AltaUsuarioPage implements OnInit, OnDestroy {
       resultType: CameraResultType.Uri
     });
 
-    this.subirFotoPerfil(image);
+    this.savePhoto(image);
   }
 
-  async subirFotoPerfil(file : any) {
+  async savePhoto(file : any) {
     if(file) {
       if(file.format == 'jpg' || file.format == 'jpeg' || file.format == 'png' || file.format == 'jfif') {
-        //this.alert.waitAlert('Publicando...', 'Esto puede demorar unos segundos');
-
-        //let id_imagen = this.firestore.createId();
-        //let fecha = new Date();
-
-        const response = await fetch(file.webPath!);
-        this.imgFileBlob = await response.blob();
-
-        //const path = 'Relevamiento/' + this.auth.nombre + '_' + this.auth.id + '/' + fecha.getTime() + '.' + file.format;
-        //const uploadTask = await this.firestorage.upload(path, blob); 
-        //const url = await uploadTask.ref.getDownloadURL(); 
+        this.imgFile = file;
       } else {
         this.alert.sweetAlert("ERROR", "Formato de archivo incompatible", 'error');
       }
@@ -174,11 +212,9 @@ export class AltaUsuarioPage implements OnInit, OnDestroy {
     }
   }
 
-  reestablecerDatos()
-  {
-    this.imgPerfil = '';
-    this.imgFileBlob = null;
-    this.form.reset({ nombre: '', apellido: '', correo: '', dni: 0, clave: '', confirmarClave: ''});
+  clearData() {
+    this.imgFile = null;
+    this.form.reset({ nombre: '', apellido: '', correo: '', dni: '', clave: '', confirmarClave: ''});
   }
 
   goBack() {

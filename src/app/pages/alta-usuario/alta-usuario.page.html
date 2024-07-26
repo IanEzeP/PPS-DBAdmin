@@ -9,24 +9,75 @@
 
 <ion-content [fullscreen]="true">
   <div id="container">
-  
-    <ion-fab *ngIf="this.scanAvailable && this.scanSupported" size="small" slot="fixed" vertical="top" horizontal="end" edge="true">
-      <ion-fab-button (click)="scan()" color="primary">
-        <img src=""  style="padding: 10px;" alt="SCAN QR">
-      </ion-fab-button>
-    </ion-fab>
-    <!--
     <ion-card>
-      <ion-item>
-        <ion-label>{{ this.apellido }}</ion-label>
-      </ion-item>
-      <ion-item>
-        <ion-label>{{ this.nombre }}</ion-label>
-      </ion-item>
-      <ion-item>
-        <ion-label>{{ this.dni }}</ion-label>
-      </ion-item>
+      <form class="needs-validation" [formGroup]="form" (ngSubmit)="onSubmit()">
+        <div class="photo-container">
+          <ion-button shape="round" [disabled]="!(this.scanAvailable && this.scanSupported)" (click)="takePhoto()" class="scan-button">
+            Escaneár DNI
+          </ion-button>
+        </div>
+        <ion-item>
+          <ion-input label="Nombre" type="text" labelPlacement="floating" formControlName="nombre"></ion-input>
+        </ion-item>
+        <ion-text class="error" color="danger" *ngIf="isValidField('nombre')">
+          {{ getErrorByField("nombre") }}
+        </ion-text>
+  
+        <ion-item>
+          <ion-input label="Apellido" type="text" labelPlacement="floating" formControlName="apellido"></ion-input>
+        </ion-item>
+        <ion-text class="error" color="danger" *ngIf="isValidField('apellido')">
+          {{ getErrorByField("apellido") }}
+        </ion-text>
+  
+        <ion-item>
+          <ion-input label="DNI" type="number" labelPlacement="floating" formControlName="dni"></ion-input>
+        </ion-item>
+        <ion-text class="error" color="danger" *ngIf="isValidField('dni')">
+          {{ getErrorByField("dni") }}
+        </ion-text>
+        
+        <ion-item>
+          <ion-input label="Correo:" type="email" labelPlacement="floating" formControlName="correo"></ion-input>
+        </ion-item>
+        <ion-text class="error" color="danger" *ngIf="isValidField('correo')">
+          {{ getErrorByField("correo") }}
+        </ion-text>
+  
+        <ion-item>
+          <ion-input label="Clave:" type="password" labelPlacement="floating" formControlName="clave"></ion-input>
+        </ion-item>
+        <ion-text class="error" color="danger" *ngIf="isValidField('clave')">
+          {{ getErrorByField("clave") }}
+        </ion-text>
+  
+        <ion-item>
+          <ion-input label="Repetir clave:" type="password" labelPlacement="floating" formControlName="confirmarClave"></ion-input>
+        </ion-item>
+        <ion-text class="error" color="danger" *ngIf="isValidField('confirmarClave')">
+          {{ getErrorByField("confirmarClave") }}
+        </ion-text>
+  
+        <ion-item>
+          <div class="photo-container">
+            <ion-label position="stacked">Foto de usuario</ion-label>
+            <ion-button shape="round" (click)="takePhoto()" class="photo-button">
+              <img src="../../../assets/images/camera.png" style="height: 30px; padding:3px;" alt="">
+              &nbsp;Tomar foto
+            </ion-button>
+          </div>
+          
+        </ion-item>
+        <ion-item>
+          <div class="photo-container" *ngIf="imgFile">
+            <img [src]="imgFile.webPath" height="100px">
+          </div>
+        </ion-item>
+
+        <ion-button color="tertiary" expand="block" type="submit" [disabled]="form.invalid || !imgFile">
+          Registrar
+        </ion-button>
+      </form>
     </ion-card>
--->
   </div>
 </ion-content>
