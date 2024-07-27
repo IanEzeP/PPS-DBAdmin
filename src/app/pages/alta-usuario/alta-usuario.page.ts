@@ -25,6 +25,8 @@ export class AltaUsuarioPage implements OnInit {
   public scanSupported: boolean = false;
   public scanAvailable: boolean = false;
 
+  //No me permite scrollear, corregirlo, el problema esta en .scss
+
   constructor(private firestore: AngularFirestore, private firestorage: AngularFireStorage, private alert: AlertService, private router: Router, 
     private auth: AuthService, public formBuilder: FormBuilder, private validator: ValidatorService) 
   { 

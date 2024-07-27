@@ -43,6 +43,11 @@ export class HomePage implements OnInit, OnDestroy {
         if (aLower > bLower) { return 1; }
         return 0;
       });
+
+      this.listUsers.forEach(usuario => {
+        let stringDni: string = usuario.dni.toString();
+        usuario.dni = `${stringDni.substring(0, 2)}.${stringDni.substring(2, 5)}.${stringDni.substring(5)}`;
+      }); //Pasarlo a un pipe
       
       this.loaded = data? true : false;
     });

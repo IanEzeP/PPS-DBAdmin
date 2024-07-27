@@ -5,23 +5,25 @@
   left: 0;
   right: 0;
   top: 50%;
+  height: 100%;
   transform: translateY(-50%);
 }
 
 #container strong {
-  font-size: 20px;
+  font-size: 24px;
   line-height: 26px;
 }
 
-#container p {
-  font-size: 16px;
-  line-height: 22px;
-
-  color: #8c8c8c;
-
-  margin: 0;
+ion-label {
+  font-size: 22px;
 }
 
-#container a {
-  text-decoration: none;
+ion-list {
+  background-color: #e78c14;
+
+}
+
+ion-content{
+  --background: #e78c14;
+  //--overflow: hidden;
 }

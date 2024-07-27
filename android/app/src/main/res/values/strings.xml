@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="app_name">Administrar usuarios</string>
+    <string name="title_activity_main">Administrar usuarios</string>
+    <string name="package_name">pps.iep.dba</string>
+    <string name="custom_url_scheme">pps.iep.dba</string>
+</resources>
