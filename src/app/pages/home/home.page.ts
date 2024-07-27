@@ -35,6 +35,15 @@ export class HomePage implements OnInit, OnDestroy {
     this.subsUsuarios = obsUsuarios.subscribe((data: any) => {
       console.log(data);
       this.listUsers = data;
+      this.listUsers.sort((a, b) => {
+        let aLower = a.apellido.toLowerCase();
+        let bLower = b.apellido.toLowerCase();
+
+        if (aLower < bLower) { return -1; }
+        if (aLower > bLower) { return 1; }
+        return 0;
+      });
+      
       this.loaded = data? true : false;
     });
   }

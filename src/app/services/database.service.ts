@@ -45,8 +45,6 @@ export class DatabaseService {
       return null;
     });
 
-    console.log(usrPromise);
-
     return usrPromise;
   }
 
