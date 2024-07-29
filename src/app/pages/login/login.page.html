@@ -1,43 +1,46 @@
 <ion-header [translucent]="true">
   <ion-toolbar color="warning">
-    <ion-title>Carga Crédito</ion-title>
+    <ion-title>Administración de Usuarios</ion-title>
   </ion-toolbar>
 </ion-header>
 
 <ion-content [fullscreen]="true">
 
-  <div id="container">
+  <div class="container">
 
-    <h1>Login standard, a la espera de personalización</h1>
+    <h1>Complete sus datos para ingresar</h1>
 
     <form class="needs-validation" [formGroup]="formLog">
-      <ion-input label="Correo:" type="email" fill="solid" formControlName="email"></ion-input>
-      <ion-text class="error" color="danger" *ngIf="isValidField('email')">
+      <ion-input class="login" shape="round" label="Correo:" type="email" formControlName="email"></ion-input>
+      <ion-text class="error" color="warning" *ngIf="isValidField('email')">
         {{ getErrorByField("email") }}
       </ion-text>
 
-      <ion-input label="Clave:" type="password" fill="solid" formControlName="password"></ion-input>
-      <ion-text class="error" color="danger" *ngIf="isValidField('password')">
+      <ion-input class="login" shape="round" label="Clave:" type="password" formControlName="password"></ion-input>
+      <ion-text class="error" color="warning" *ngIf="isValidField('password')">
         {{ getErrorByField("password") }}
       </ion-text>
       
-      <ion-button color="tertiary" expand="block" (click)="this.iniciarSesion()">Ingresar</ion-button>
+      <ion-button class="enter" color="tertiary" expand="full" (click)="this.iniciarSesion()">
+        Iniciar Sesión
+        <ion-icon name="arrow-forward-circle-outline" size="large"></ion-icon>
+      </ion-button>
     </form>
     
+    <p><span>Acceso Rápido</span></p>
     <div *ngIf="this.cargaFin == true; then mostrar else esperar"></div>
-
     <ng-template #mostrar>
-      <ion-select label="Usuario rápido" fill="solid" interface="popover" (ionChange)="onQuickUser($event)">
-        <ion-select-option *ngFor="let item of arrayTestUsers" [value]="item">{{item.perfil}}</ion-select-option>
-      </ion-select>
+      
+      <ion-button fill="outline" class="quick" color="warning" *ngFor="let item of arrayTestUsers" (click)="onQuickUser(item)">
+        <ion-icon name="person-circle-sharp"></ion-icon> Perfil: {{item.perfil}}
+      </ion-button>
     </ng-template>
-
     <ng-template #esperar>
-      <ion-select label="Cargando..." fill="outline"></ion-select>
-    </ng-template>
-    
-    <img src="../../assets/" alt="Logo" style="max-width: 50%; max-height: 50%; margin: auto;
-    display: block; margin-top: 40px;">
 
+      <ion-button class="quick" color="warning"  >Cargando usuario...</ion-button>
+      <ion-button class="quick" color="warning"  >Cargando usuario...</ion-button>
+      <ion-button class="quick" color="warning"  >Cargando usuario...</ion-button>
+      <ion-button class="quick" color="warning"  >Cargando usuario...</ion-button>
+    </ng-template>
   </div>
 </ion-content>

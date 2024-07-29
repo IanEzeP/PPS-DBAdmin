@@ -1,3 +1,63 @@
+ion-content {
+    --background: linear-gradient(#ee15ee, #240da6);
+}
+
+div.container {
+    height: 100%;
+    width: 100%;
+}
+
+h1 {
+    margin-top: 60px;
+    margin-left: 5%;
+    margin-bottom: 45px;
+    font-size: xx-large;
+    font-weight: 600;
+    color: white;
+}
+
+ion-button.quick {
+    width: 200px;
+    height: 70px;
+    font-size: 18px;
+    font-weight: 500;
+}
+
+ion-button.enter {
+    margin-top: 55px;
+    margin-bottom: 40px;
+
+    height: 90px;
+
+    font-size: 20px;
+    font-weight: 600;
+}
+
 ion-input.error {
     font-size: 18px;
+}
+
+ion-input.login {
+    font-size: 22px;
+    --background: #343435;
+    color: rgb(247, 247, 247);
+    width: 90%;
+    height: 50px;
+    margin-left: 5%;
+    margin-top: 30px;
+}
+
+p {
+    width: 100%;
+    text-align: center;
+    color: var(--ion-color-light);
+    line-height: 0.5em;
+    font-size: 20px;
+
+    margin-top: 65px;
+    margin-bottom: 45px;
+    span {
+        background: none;
+        padding:0 10px;
+    }
 }

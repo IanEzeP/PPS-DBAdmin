@@ -16,18 +16,18 @@
 
   <div class="container">
     <ion-list lines="full" *ngIf="this.loaded">
-      <ion-list-header lines="full" color="tertiary">
+      <ion-list-header lines="full" color="dark">
         <h1>Listado de Usuarios</h1>
       </ion-list-header>
 
       <div *ngFor="let user of this.listUsers">
-        <ion-item lines="none">
+        <ion-item lines="none" color="warning">
           <ion-thumbnail slot="start" style="--border-radius: 4px;">
             <img alt="" src="{{ user.foto }}" />
           </ion-thumbnail>
           <strong>{{ user.apellido | titlecase }} {{ user.nombre | titlecase }}</strong>
         </ion-item>
-        <ion-item>
+        <ion-item color="warning">
           <ion-label>DNI: {{ user.dni }}</ion-label>
           <ion-label>Correo: {{ user.correo }}</ion-label>
         </ion-item>

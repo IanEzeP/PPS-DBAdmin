@@ -53,7 +53,7 @@ export class LoginPage implements OnInit, OnDestroy {
       });
       
       this.arrayFirebase.forEach(user => {
-        if (user.id == 1 || user.id == 2 || user.id == 3) {
+        if (user.id != 5) {
           this.arrayTestUsers.push(user);
         }
 
@@ -121,8 +121,8 @@ export class LoginPage implements OnInit, OnDestroy {
   }
 
   onQuickUser(user: any) {
-    this.formLog.controls['email'].setValue(user.target.value.correo);
-    this.formLog.controls['password'].setValue(user.target.value.clave);
+    this.formLog.controls['email'].setValue(user.correo);
+    this.formLog.controls['password'].setValue(user.clave);
   }
 
   cleanInputs() {
