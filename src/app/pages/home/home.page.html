@@ -36,18 +36,18 @@
     </ion-list>
 
     <ion-list lines="full" *ngIf="!this.loaded">
-      <ion-list-header lines="full" color="tertiary">
+      <ion-list-header lines="full" color="dark">
         <h1>Listado de Usuarios</h1>
       </ion-list-header>
 
       <div *ngFor="let skeleton of this.placeholderArray">
-        <ion-item lines="none">
+        <ion-item lines="none" color="warning">
           <ion-thumbnail slot="start" style="--border-radius: 4px;">
             <ion-skeleton-text [animated]="true"></ion-skeleton-text>
           </ion-thumbnail>
           <ion-skeleton-text [animated]="true" style="width: 70%; height: 18px;"></ion-skeleton-text>
         </ion-item>
-        <ion-item>
+        <ion-item color="warning">
           <ion-skeleton-text [animated]="true" style="width: 100%; height: 32px; margin-top: 20px;"></ion-skeleton-text>
         </ion-item>        
       </div>
